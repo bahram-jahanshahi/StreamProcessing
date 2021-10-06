@@ -26,7 +26,7 @@ public class StreamsStarterApp {
 
         StreamsBuilder builder = new StreamsBuilder();
 
-        KStream<String, String> wordCountInput = builder.stream("streams-plaintext-input");
+        KStream<String, String> wordCountInput = builder.stream("streams-input-topic");
 
         KTable<String, Long> wordCountTable = wordCountInput
                 .mapValues(value -> value.toLowerCase())
@@ -35,7 +35,7 @@ public class StreamsStarterApp {
                 .groupByKey()
                 .count(Named.as("Counts"));
 
-        wordCountTable.toStream().to("streams-plaintext-output", Produced.with(Serdes.String(), Serdes.Long()));
+        wordCountTable.toStream().to("streams-output-output", Produced.with(Serdes.String(), Serdes.Long()));
 
         KafkaStreams streams = new KafkaStreams(builder.build(), config);
         streams.start();
