@@ -34,7 +34,7 @@ public class StreamsStarterApp {
                 .groupByKey()
                 .count(Named.as("Counts"));
 
-        wordCountTable.toStream().to("streams-output-output", Produced.with(Serdes.String(), Serdes.Long()));
+        wordCountTable.toStream().to("streams-output-topic", Produced.with(Serdes.String(), Serdes.Long()));
 
         KafkaStreams streams = new KafkaStreams(builder.build(), config);
         streams.start();

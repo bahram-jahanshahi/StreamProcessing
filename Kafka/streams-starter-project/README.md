@@ -25,7 +25,7 @@ $ bin/kafka-server-start.sh config/server.properties
 ## STEP 3: Create the needed topics 
 ```shell
 $ bin/kafka-topics.sh --create --topic streams-input-topic --partitions 1 --replication-factor 1 --bootstrap-server localhost:9092
-$ bin/kafka-topics.sh --create --topic streams-output-output --partitions 1 --replication-factor 1 --bootstrap-server localhost:9092
+$ bin/kafka-topics.sh --create --topic streams-output-topic --partitions 1 --replication-factor 1 --bootstrap-server localhost:9092
 ```
 
 #### Describe the topics
@@ -70,7 +70,7 @@ public class StreamsStarterApp {
                 .groupByKey()
                 .count(Named.as("Counts"));
 
-        wordCountTable.toStream().to("streams-output-output", Produced.with(Serdes.String(), Serdes.Long()));
+        wordCountTable.toStream().to("streams-output-topic", Produced.with(Serdes.String(), Serdes.Long()));
 
         KafkaStreams streams = new KafkaStreams(builder.build(), config);
         streams.start();
