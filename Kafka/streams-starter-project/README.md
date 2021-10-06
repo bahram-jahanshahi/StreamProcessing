@@ -15,52 +15,71 @@ $ cd kafka_2.13-3.0.0
 *NOTE: Your local environment must have Java 8+ installed* :wink: 
 ### Run ZooKeeper Service
 ```shell
-bin/zookeeper-server-start.sh config/zookeeper.properties
+$ bin/zookeeper-server-start.sh config/zookeeper.properties
 ```
 ### Run Kafka Broker Service
 ```shell
-bin/kafka-server-start.sh config/server.properties
+$ bin/kafka-server-start.sh config/server.properties
 ```
 
 ## STEP 3: Create the needed topics 
 ```shell
-bin/kafka-topics.sh --create --topic streams-input-topic --bootstrap-server localhost:9092
-bin/kafka-topics.sh --create --topic streams-output-output --bootstrap-server localhost:9092
+$ bin/kafka-topics.sh --create --topic streams-input-topic --bootstrap-server localhost:9092
+$ bin/kafka-topics.sh --create --topic streams-output-output --bootstrap-server localhost:9092
 ```
 
 #### Describe the topics
 ```shell
-bin/kafka-topics.sh --describe --topic streams-input-topic --bootstrap-server localhost:9092
+$ bin/kafka-topics.sh --describe --topic streams-input-topic --bootstrap-server localhost:9092
 ```
 
 ## STEP 4: Kafka in Java
 
 ```java
-Properties config = new Properties();
-config.put(StreamsConfig.APPLICATION_ID_CONFIG, "streams-starter-app");
-config.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-config.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
-config.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.common.serialization.Serdes;
+import org.apache.kafka.streams.KafkaStreams;
+import org.apache.kafka.streams.StreamsBuilder;
+import org.apache.kafka.streams.StreamsConfig;
+import org.apache.kafka.streams.kstream.KStream;
+import org.apache.kafka.streams.kstream.KTable;
+import org.apache.kafka.streams.kstream.Named;
+import org.apache.kafka.streams.kstream.Produced;
 
-StreamsBuilder builder = new StreamsBuilder();
+import java.util.Arrays;
+import java.util.Properties;
 
-KStream<String, String> wordCountInput = builder.stream("streams-input-topic");
+public class StreamsStarterApp {
 
-KTable<String, Long> wordCountTable = wordCountInput
-        .mapValues(value -> value.toLowerCase())
-        .flatMapValues(value -> Arrays.asList(value.split(" ")))
-        .selectKey((key, value) -> value)
-        .groupByKey()
-        .count(Named.as("Counts"));
+    public static void main(String[] args) {
+        Properties config = new Properties();
+        config.put(StreamsConfig.APPLICATION_ID_CONFIG, "streams-starter-app");
+        config.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        config.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
+        config.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
 
-wordCountTable.toStream().to("streams-output-output", Produced.with(Serdes.String(), Serdes.Long()));
+        StreamsBuilder builder = new StreamsBuilder();
 
-KafkaStreams streams = new KafkaStreams(builder.build(), config);
-streams.start();
+        KStream<String, String> wordCountInput = builder.stream("streams-input-topic");
+
+        KTable<String, Long> wordCountTable = wordCountInput
+                .mapValues(value -> value.toLowerCase())
+                .flatMapValues(value -> Arrays.asList(value.split(" ")))
+                .selectKey((key, value) -> value)
+                .groupByKey()
+                .count(Named.as("Counts"));
+
+        wordCountTable.toStream().to("streams-output-output", Produced.with(Serdes.String(), Serdes.Long()));
+
+        KafkaStreams streams = new KafkaStreams(builder.build(), config);
+        streams.start();
+
+    }
+}
 ```
 
 ## STEP 5: Listen to the output topic
 ```shell
-bin/kafka-console-consumer.sh --topic quickstart-events --from-beginning --bootstrap-server localhost:9092
+$ bin/kafka-console-consumer.sh --topic quickstart-events --from-beginning --bootstrap-server localhost:9092
 ```
