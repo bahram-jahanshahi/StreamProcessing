@@ -35,6 +35,7 @@ $ bin/kafka-topics.sh --describe --topic streams-input-topic --bootstrap-server 
 
 ## STEP 4: Kafka in Java
 
+It is the time to run your java application:
 ```java
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.Serdes;
@@ -79,7 +80,15 @@ public class StreamsStarterApp {
 }
 ```
 
-## STEP 5: Listen to the output topic
+## STEP 5: Add some event to input topic
 ```shell
-$ bin/kafka-console-consumer.sh --topic quickstart-events --from-beginning --bootstrap-server localhost:9092
+$ bin/kafka-console-producer.sh --topic streams-input-topic --bootstrap-server localhost:9092
+> This is my first event
+> This is my second event
+> This is my third event
+```
+
+## STEP 6: Listen to the output topic
+```shell
+$ bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic streams-output-topic    --from-beginning    --formatter kafka.tools.DefaultMessageFormatter --property print.key=true --property print.value=true --property key.deserializer=org.apache.kafka.common.serialization.StringDeserializer --property value.deserializer=org.apache.kafka.common.serialization.LongDeserializer
 ```
