@@ -24,8 +24,8 @@ $ bin/kafka-server-start.sh config/server.properties
 
 ## STEP 3: Create the needed topics 
 ```shell
-$ bin/kafka-topics.sh --create --topic streams-input-topic --bootstrap-server localhost:9092
-$ bin/kafka-topics.sh --create --topic streams-output-output --bootstrap-server localhost:9092
+$ bin/kafka-topics.sh --create --topic streams-input-topic --partitions 1 --replication-factor 1 --bootstrap-server localhost:9092
+$ bin/kafka-topics.sh --create --topic streams-output-output --partitions 1 --replication-factor 1 --bootstrap-server localhost:9092
 ```
 
 #### Describe the topics
