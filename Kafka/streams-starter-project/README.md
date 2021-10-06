@@ -6,8 +6,8 @@ Go to [Apache Kafka](https://kafka.apache.org/) website and download Kafka versi
 Then extract the compressed file in a folder. Now Kafka is installed! :ok_hand: 
 
 ```shell
-tar -xzf kafka_2.13-3.0.0.tgz
-cd kafka_2.13-3.0.0
+$ tar -xzf kafka_2.13-3.0.0.tgz
+$ cd kafka_2.13-3.0.0
 ```
 
 
