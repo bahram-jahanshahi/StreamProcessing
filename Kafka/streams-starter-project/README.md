@@ -76,6 +76,11 @@ public class StreamsStarterApp {
         KafkaStreams streams = new KafkaStreams(builder.build(), config);
         streams.start();
 
+        // printed the topology
+        System.out.println(streams.toString());
+
+        // Graceful Shutdown: shutdown hook to correctly close the streams application
+        Runtime.getRuntime().addShutdownHook(new Thread(streams::close));
     }
 }
 ```
